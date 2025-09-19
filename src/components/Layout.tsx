@@ -1,7 +1,8 @@
 import { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import { LogIn, LogOut, Users, DollarSign, Calendar, Activity } from 'lucide-react';
+import { useTheme } from '@/contexts/ThemeContext';
+import { LogIn, LogOut, Users, DollarSign, Calendar, Activity, Moon, Sun } from 'lucide-react';
 import { mockData } from '@/data/mockData';
 
 interface LayoutProps {
@@ -12,6 +13,7 @@ interface LayoutProps {
 
 export const Layout = ({ children, activeTab, onTabChange }: LayoutProps) => {
   const { user, logout, isAdmin } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
   const tabs = [
     { id: 'dashboard', label: 'Dashboard', icon: Activity },
@@ -36,6 +38,13 @@ export const Layout = ({ children, activeTab, onTabChange }: LayoutProps) => {
               <span className="text-sm text-muted-foreground">
                 Selamat datang, {user?.name}
               </span>
+              <Button variant="ghost" size="sm" onClick={toggleTheme}>
+                {theme === 'light' ? (
+                  <Moon className="w-4 h-4" />
+                ) : (
+                  <Sun className="w-4 h-4" />
+                )}
+              </Button>
               {isAdmin ? (
                 <Button variant="outline" size="sm" onClick={logout}>
                   <LogOut className="w-4 h-4 mr-2" />
@@ -52,30 +61,32 @@ export const Layout = ({ children, activeTab, onTabChange }: LayoutProps) => {
         </div>
       </header>
 
-      {/* Navigation */}
-      <nav className="border-b bg-card">
-        <div className="container mx-auto px-4">
-          <div className="flex space-x-1">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => onTabChange(tab.id)}
-                  className={`flex items-center px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                    activeTab === tab.id
-                      ? 'border-primary text-primary'
-                      : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
-                  }`}
-                >
-                  <Icon className="w-4 h-4 mr-2" />
-                  {tab.label}
-                </button>
-              );
-            })}
+      {/* Navigation - Only show for Admin */}
+      {isAdmin && (
+        <nav className="border-b bg-card">
+          <div className="container mx-auto px-4">
+            <div className="flex space-x-1">
+              {tabs.map((tab) => {
+                const Icon = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => onTabChange(tab.id)}
+                    className={`flex items-center px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                      activeTab === tab.id
+                        ? 'border-primary text-primary'
+                        : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4 mr-2" />
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        </div>
-      </nav>
+        </nav>
+      )}
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-6">
